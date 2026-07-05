@@ -6,14 +6,14 @@ WORKDIR /app
 # Note: Removed system dependencies as they're not needed for this project
 
 # Copy requirements
-COPY backend/requirements.txt .
+COPY leadai/backend/requirements.txt .
 
 # Install Python dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy application code
-COPY backend/ /app/backend/
-COPY frontend/ /app/frontend/
+COPY leadai/backend/ /app/backend/
+COPY leadai/frontend/ /app/frontend/
 
 # Expose port
 EXPOSE 8000

@@ -5,6 +5,17 @@ Main entry point for the API server
 
 import os
 import logging
+from dotenv import load_dotenv
+
+# Load .env file from parent directory of main.py
+backend_dir = os.path.dirname(os.path.abspath(__file__))
+parent_dir = os.path.dirname(backend_dir)
+env_path = os.path.join(parent_dir, ".env")
+if os.path.exists(env_path):
+    load_dotenv(env_path)
+else:
+    load_dotenv()
+
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles

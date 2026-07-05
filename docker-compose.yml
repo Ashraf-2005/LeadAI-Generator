@@ -16,8 +16,8 @@ services:
       - LEAD_SCORE_THRESHOLD=70
       - MONGO_URI=${MONGO_URI}
     volumes:
-      - ./backend:/app/backend
-      - ./data:/app/data
+      - ./leadai/backend:/app/backend
+      - ./leadai/data:/app/data
     networks:
       - leadai-network
     restart: unless-stopped
@@ -30,7 +30,7 @@ services:
       - "80:80"
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf:ro
-      - ./frontend:/usr/share/nginx/html:ro
+      - ./leadai/frontend:/usr/share/nginx/html:ro
     depends_on:
       - backend
     networks:
