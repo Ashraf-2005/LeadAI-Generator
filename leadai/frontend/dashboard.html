@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LeadAI - Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    <nav class="bg-blue-600 text-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
+            <h1 class="text-2xl font-bold">LeadAI Dashboard</h1>
+            <button onclick="logout()" class="bg-blue-800 hover:bg-blue-900 px-4 py-2 rounded">Logout</button>
+        </div>
+    </nav>
+
+    <div class="max-w-7xl mx-auto px-4 py-8">
+        <!-- Tabs -->
+        <div class="flex gap-4 mb-6">
+            <button onclick="switchTab('leads')" class="tab-button active bg-blue-600 text-white px-4 py-2 rounded-lg" data-tab="leads">
+                📊 All Leads
+            </button>
+            <button onclick="switchTab('add')" class="tab-button bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300" data-tab="add">
+                ➕ Add Lead
+            </button>
+            <button onclick="switchTab('upload')" class="tab-button bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300" data-tab="upload">
+                📁 Upload CSV
+            </button>
+        </div>
+
+        <!-- Leads Tab -->
+        <div id="leads-tab" class="tab-content block">
+            <div class="bg-white rounded-lg shadow-lg p-6">
+                <div class="flex flex-wrap gap-4 items-center mb-6">
+                    <div class="flex-1 min-w-[200px]">
+                        <label class="block text-xs font-semibold text-gray-500 uppercase mb-1">Search Leads</label>
+                        <input 
+                            type="text" 
+                            id="searchInput" 
+                            placeholder="Filter by company..."
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                        >
+                    </div>
+                    <div class="w-full md:w-auto pt-5">
+                        <div class="flex gap-2">
+                            <input 
+                                type="text" 
+                                id="removeByNameInput" 
+                                placeholder="Company to remove..."
+                                class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500"
+                            >
+                            <button onclick="handleRemoveByName()" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg font-semibold transition-colors">
+                                Remove Lead
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Filter Buttons -->
+                <div class="flex gap-2 mb-6">
+                    <button onclick="filterLeads('all', this)" class="filter-btn active bg-blue-600 text-white px-4 py-2 rounded">All</button>
+                    <button onclick="filterLeads('Hot', this)" class="filter-btn bg-red-200 text-red-800 px-4 py-2 rounded">Hot</button>
+                    <button onclick="filterLeads('Warm', this)" class="filter-btn bg-yellow-200 text-yellow-800 px-4 py-2 rounded">Warm</button>
+                    <button onclick="filterLeads('Cold', this)" class="filter-btn bg-blue-200 text-blue-800 px-4 py-2 rounded">Cold</button>
+                </div>
+
+                <!-- Leads Table -->
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead>
+                            <tr class="bg-gray-100">
+                                <th class="px-4 py-2 text-left font-semibold">Company</th>
+                                <th class="px-4 py-2 text-left font-semibold">Industry</th>
+                                <th class="px-4 py-2 text-left font-semibold">Score</th>
+                                <th class="px-4 py-2 text-left font-semibold">Contact Role</th>
+                                <th class="px-4 py-2 text-left font-semibold">Email</th>
+                                <th class="px-4 py-2 text-left font-semibold">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="leadsTableBody">
+                            <!-- Populated by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+                <div id="emptyState" class="text-center py-8 text-gray-500">
+                    No leads found. Add a lead or upload a CSV to get started.
+                </div>
+            </div>
+        </div>
+
+        <!-- Add Lead Tab -->
+        <div id="add-tab" class="tab-content hidden">
+            <div class="bg-white rounded-lg shadow-lg p-6 max-w-2xl">
+                <h2 class="text-2xl font-bold text-gray-900 mb-6">Add Single Lead</h2>
+                <form id="addLeadForm" class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Company Name *</label>
+                        <input type="text" name="company_name" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Industry *</label>
+                        <input type="text" name="industry" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="e.g., SaaS, FinTech, Healthcare">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Website</label>
+                        <input type="url" name="website" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="https://...">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Notes *</label>
+                        <textarea name="notes" required rows="5" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="Sales notes, context, needs, etc."></textarea>
+                    </div>
+                    <div id="addLeadError" class="hidden bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded"></div>
+                    <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg">Add Lead</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Upload CSV Tab -->
+        <div id="upload-tab" class="tab-content hidden">
+            <div class="bg-white rounded-lg shadow-lg p-6 max-w-2xl">
+                <h2 class="text-2xl font-bold text-gray-900 mb-6">Upload Leads (CSV)</h2>
+                
+                <div class="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                    <p class="text-sm text-gray-700 mb-2"><strong>CSV Format:</strong></p>
+                    <p class="text-sm text-gray-600 font-mono">company_name,industry,website,notes</p>
+                </div>
+
+                <form id="uploadForm" class="space-y-4">
+                    <div class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
+                        <input type="file" id="csvFile" accept=".csv" required class="hidden">
+                        <label for="csvFile" class="cursor-pointer">
+                            <p class="text-lg font-semibold text-gray-700">Click to upload CSV</p>
+                            <p class="text-sm text-gray-500">or drag and drop</p>
+                        </label>
+                    </div>
+                    <div id="uploadError" class="hidden bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded"></div>
+                    <div id="uploadSuccess" class="hidden bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded"></div>
+                    <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg">Upload</button>
+                </form>
+
+                <a href="/sample_data/sample_leads.csv" class="mt-6 inline-block text-blue-600 hover:underline">
+                    📥 Download Sample CSV
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for Email Preview -->
+    <div id="emailModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-screen overflow-y-auto">
+            <div class="p-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-2xl font-bold text-gray-900">Email Draft Preview</h2>
+                    <button onclick="closeEmailModal()" class="text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
+                </div>
+
+                <div id="emailContent" class="space-y-4">
+                    <!-- Populated by JavaScript -->
+                </div>
+
+                <div class="mt-6 flex gap-4">
+                    <button onclick="copyEmail()" class="flex-1 bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg">
+                        📋 Copy Email
+                    </button>
+                    <button onclick="markAsSent()" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg">
+                        ✓ Mark as Sent
+                    </button>
+                    <button onclick="closeEmailModal()" class="flex-1 bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-lg">
+                        Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for Lead Details -->
+    <div id="leadModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-screen overflow-y-auto">
+            <div class="p-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-2xl font-bold text-gray-900" id="leadName"></h2>
+                    <button onclick="closeLeadModal()" class="text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
+                </div>
+
+                <div id="leadDetails" class="space-y-4">
+                    <!-- Populated by JavaScript -->
+                </div>
+
+                <div class="mt-6 flex gap-4">
+                    <button onclick="deleteLead()" class="flex-1 bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg">
+                        🗑️ Delete Lead
+                    </button>
+                    <button onclick="closeLeadModal()" class="flex-1 bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-lg">
+                        Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Modal for Selection (Remove Lead) -->
+    <div id="selectionModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-[80vh] overflow-hidden flex flex-col">
+            <div class="p-6 border-b">
+                <div class="flex justify-between items-center">
+                    <h2 class="text-2xl font-bold text-gray-900">Multiple Matches Found</h2>
+                    <button onclick="closeSelectionModal()" class="text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
+                </div>
+                <p class="text-gray-600 mt-2">Which lead for <span id="selectionCompanyName" class="font-bold"></span> would you like to remove?</p>
+            </div>
+            
+            <div class="flex-1 overflow-y-auto p-6" id="selectionList">
+                <!-- Populated by JavaScript -->
+            </div>
+
+            <div class="p-6 border-t bg-gray-50 flex justify-end">
+                <button onclick="closeSelectionModal()" class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 px-6 rounded-lg">
+                    Cancel
+                </button>
+            </div>
+        </div>
+    </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/app.js"></script>
+    <script>
+        // Cache buster: 2026-07-04-v2
+        // Check authentication
+        if (!localStorage.getItem('access_token')) {
+            window.location.href = '/';
+        }
+
+        let leads = [];
+        let currentLead = null;
+        let currentFilter = 'all';
+
+        // Initialize on DOM ready
+        document.addEventListener('DOMContentLoaded', function() {
+            loadLeads();
+            
+            // Add Lead Form
+            const addLeadForm = document.getElementById('addLeadForm');
+            if (addLeadForm) {
+                addLeadForm.addEventListener('submit', handleAddLead);
+            }
+
+            // Upload CSV Form
+            const uploadForm = document.getElementById('uploadForm');
+            if (uploadForm) {
+                uploadForm.addEventListener('submit', handleUploadCSV);
+            }
+
+            // Search
+            const searchInput = document.getElementById('searchInput');
+            if (searchInput) {
+                searchInput.addEventListener('input', renderLeads);
+            }
+        });
+
+        async function loadLeads() {
+            try {
+                const response = await fetch('/api/leads/', {
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('access_token')}` }
+                });
+
+                if (!response.ok) throw new Error('Failed to load leads');
+
+                leads = await response.json();
+                renderLeads();
+            } catch (error) {
+                console.error('Error loading leads:', error);
+            }
+        }
+
+        async function handleAddLead(e) {
+            console.log('handleAddLead called with event:', e);
+            
+            // Prevent default if event exists
+            if (e && typeof e.preventDefault === 'function') {
+                e.preventDefault();
+            }
+
+            const errorDiv = document.getElementById('addLeadError');
+            const form = e?.target || document.getElementById('addLeadForm');
+
+            if (!form) {
+                console.error('Could not find addLeadForm element');
+                return;
+            }
+
+            // Basic validation
+            const requiredFields = ['company_name', 'industry', 'notes'];
+            const missingFields = requiredFields.filter(name => !form.elements[name]?.value.trim());
+            
+            if (missingFields.length > 0) {
+                const errorMsg = `Please fill out required fields: ${missingFields.join(', ').replace('_', ' ')}`;
+                errorDiv.textContent = errorMsg;
+                errorDiv.classList.remove('hidden');
+                return;
+            }
+
+            const formData = new FormData(form);
+            const data = Object.fromEntries(formData);
+
+            // Clean data
+            if (!data.website) delete data.website;
+
+            try {
+                // Show loading state if button exists
+                const submitBtn = form.querySelector('button[type="submit"]');
+                const originalBtnText = submitBtn?.textContent;
+                if (submitBtn) {
+                    submitBtn.disabled = true;
+                    submitBtn.textContent = 'Adding Lead...';
+                }
+
+                console.log('Sending lead data:', data);
+
+                const response = await fetch('/api/leads/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('access_token')}`
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.detail || 'Failed to create lead');
+                }
+
+                const result = await response.json();
+                console.log('Lead created successfully:', result);
+
+                // Success!
+                form.reset();
+                errorDiv.classList.add('hidden');
+                
+                // Show success message briefly
+                if (typeof showToast === 'function') {
+                    showToast('Lead added successfully! AI pipeline started.', 'success');
+                }
+
+                switchTab('leads');
+                await loadLeads();
+            } catch (error) {
+                console.error('Error in handleAddLead flow:', error);
+                errorDiv.textContent = `Error: ${error.message}`;
+                errorDiv.classList.remove('hidden');
+            } finally {
+                // Restore button state
+                const submitBtn = form.querySelector('button[type="submit"]');
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Add Lead';
+                }
+            }
+        }
+
+        async function handleUploadCSV(e) {
+            e.preventDefault();
+            const fileInput = document.getElementById('csvFile');
+            const errorDiv = document.getElementById('uploadError');
+            const successDiv = document.getElementById('uploadSuccess');
+
+            try {
+                const formData = new FormData();
+                formData.append('file', fileInput.files[0]);
+
+                const response = await fetch('/api/leads/bulk/upload', {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('access_token')}` },
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.detail || 'Upload failed');
+                }
+
+                const result = await response.json();
+                successDiv.textContent = `✓ Imported ${result.imported} leads. ${result.failed} failed.`;
+                successDiv.classList.remove('hidden');
+                errorDiv.classList.add('hidden');
+
+                e.target.reset();
+                await loadLeads();
+            } catch (error) {
+                errorDiv.textContent = error.message;
+                errorDiv.classList.remove('hidden');
+                successDiv.classList.add('hidden');
+            }
+        }
+
+        function renderLeads() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            let filtered = leads.filter(lead => {
+                const matchesSearch = lead.company_name.toLowerCase().includes(searchTerm);
+                const matchesFilter = currentFilter === 'all' || (lead.score && lead.score.score_label === currentFilter);
+                return matchesSearch && matchesFilter;
+            });
+
+            // Sort by score: Hot (80+) first, then Warm (50-79), then Cold (<50), then Pending
+            const scoreOrder = { 'Hot': 0, 'Warm': 1, 'Cold': 2 };
+            filtered.sort((a, b) => {
+                const aOrder = a.score ? scoreOrder[a.score.score_label] ?? 3 : 3;
+                const bOrder = b.score ? scoreOrder[b.score.score_label] ?? 3 : 3;
+                if (aOrder !== bOrder) return aOrder - bOrder;
+                // Within same category, sort by score value (highest first)
+                const aScore = a.score?.score_value ?? 0;
+                const bScore = b.score?.score_value ?? 0;
+                return bScore - aScore;
+            });
+
+            const tbody = document.getElementById('leadsTableBody');
+            const emptyState = document.getElementById('emptyState');
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = '';
+                emptyState.classList.remove('hidden');
+                return;
+            }
+
+            emptyState.classList.add('hidden');
+
+            tbody.innerHTML = filtered.map(lead => `
+                <tr class="border-b hover:bg-gray-50">
+                    <td class="px-4 py-3 font-medium text-gray-900">${lead.company_name}</td>
+                    <td class="px-4 py-3 text-gray-600">${lead.industry}</td>
+                    <td class="px-4 py-3">
+                        ${lead.score ? `
+                            <span class="px-3 py-1 rounded-full text-white text-sm font-medium"
+                                  style="background-color: ${lead.score.score_label === 'Hot' ? '#dc2626' : lead.score.score_label === 'Warm' ? '#f59e0b' : '#3b82f6'}">
+                                ${lead.score.score_label} (${lead.score.score_value})
+                            </span>
+                        ` : '<span class="text-gray-400">Pending...</span>'}
+                    </td>
+                    <td class="px-4 py-3 text-gray-600">${lead.score ? lead.score.suggested_contact_role : '-'}</td>
+                    <td class="px-4 py-3">
+                        ${lead.email_generated ? '<span class="text-green-600">✓ Ready</span>' : '<span class="text-gray-400">-</span>'}
+                    </td>
+                    <td class="px-4 py-3 space-x-2">
+                        <button onclick="viewEmailDraft('${lead.id}')" class="text-blue-600 hover:underline" ${!lead.email_generated ? 'disabled style="opacity:0.5"' : ''}>
+                            📧
+                        </button>
+                        <button onclick="viewLeadDetails('${lead.id}')" class="text-blue-600 hover:underline">
+                            👁️
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function filterLeads(filter, buttonElement) {
+            currentFilter = filter;
+            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active', 'bg-blue-600', 'text-white'));
+            if (buttonElement) {
+                buttonElement.classList.add('active', 'bg-blue-600', 'text-white');
+            }
+            renderLeads();
+        }
+
+        async function viewEmailDraft(leadId) {
+            currentLead = leads.find(l => l.id === leadId);
+            if (!currentLead || !currentLead.email) return;
+
+            document.getElementById('emailContent').innerHTML = `
+                <div>
+                    <p class="text-sm text-gray-500">To: <strong>${currentLead.company_name}</strong></p>
+                </div>
+                <div class="border-t pt-4">
+                    <p class="text-sm text-gray-500 mb-2"><strong>Subject:</strong></p>
+                    <p class="bg-gray-50 p-3 rounded border border-gray-200">${currentLead.email.subject}</p>
+                </div>
+                <div class="border-t pt-4">
+                    <p class="text-sm text-gray-500 mb-2"><strong>Body:</strong></p>
+                    <div class="bg-gray-50 p-3 rounded border border-gray-200 whitespace-pre-wrap">${currentLead.email.body}</div>
+                </div>
+                <div class="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded">
+                    <p class="text-sm text-gray-700"><strong>💡 Tip:</strong> Review and personalize this draft before sending. Feel free to edit as needed.</p>
+                </div>
+            `;
+
+            document.getElementById('emailModal').classList.remove('hidden');
+        }
+
+        async function viewLeadDetails(leadId) {
+            currentLead = leads.find(l => l.id === leadId);
+            if (!currentLead) return;
+
+            document.getElementById('leadName').textContent = currentLead.company_name;
+
+            let html = `
+                <div class="space-y-3">
+                    <div><strong>Industry:</strong> ${currentLead.industry}</div>
+                    <div><strong>Website:</strong> ${currentLead.website ? `<a href="${currentLead.website}" target="_blank" class="text-blue-600 hover:underline">${currentLead.website}</a>` : 'Not provided'}</div>
+                    <div><strong>Notes:</strong> <p class="text-gray-600 mt-1">${currentLead.notes}</p></div>
+            `;
+
+            if (currentLead.score) {
+                html += `
+                    <div class="border-t pt-4">
+                        <strong>AI Score:</strong>
+                        <div class="mt-2 space-y-2">
+                            <div><span class="font-medium">Label:</span> ${currentLead.score.score_label}</div>
+                            <div><span class="font-medium">Score:</span> ${currentLead.score.score_value}/100</div>
+                            <div><span class="font-medium">Reason:</span> ${currentLead.score.reason}</div>
+                            <div><span class="font-medium">Contact Role:</span> ${currentLead.score.suggested_contact_role}</div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            if (currentLead.email_sent) {
+                html += `<div class="border-t pt-4 text-green-600"><strong>✓ Email Sent</strong></div>`;
+            }
+
+            html += `</div>`;
+            document.getElementById('leadDetails').innerHTML = html;
+            document.getElementById('leadModal').classList.remove('hidden');
+        }
+
+        function closeEmailModal() {
+            document.getElementById('emailModal').classList.add('hidden');
+        }
+
+        function closeLeadModal() {
+            document.getElementById('leadModal').classList.add('hidden');
+        }
+
+        function copyEmail() {
+            const subject = currentLead.email.subject;
+            const body = currentLead.email.body;
+            const text = `Subject: ${subject}\n\n${body}`;
+            navigator.clipboard.writeText(text).then(() => {
+                alert('Email copied to clipboard!');
+            });
+        }
+
+        async function markAsSent() {
+            try {
+                const response = await fetch(`/api/leads/${currentLead.id}`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('access_token')}`
+                    },
+                    body: JSON.stringify({ email_sent: true })
+                });
+
+                if (!response.ok) throw new Error('Failed to update lead');
+
+                await loadLeads();
+                closeEmailModal();
+                alert('Email marked as sent!');
+            } catch (error) {
+                alert('Error: ' + error.message);
+            }
+        }
+
+        async function deleteLead(idOverride) {
+            const idToRemove = idOverride || currentLead?.id;
+            if (!idToRemove) return;
+            
+            if (!idOverride && !confirm('Are you sure? This cannot be undone.')) return;
+
+            try {
+                const response = await fetch(`/api/leads/${idToRemove}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('access_token')}` }
+                });
+
+                if (!response.ok) throw new Error('Failed to delete lead');
+
+                await loadLeads();
+                closeLeadModal();
+                closeSelectionModal();
+                showToast('Lead removed successfully', 'success');
+            } catch (error) {
+                showToast('Error: ' + error.message, 'error');
+            }
+        }
+
+        async function handleRemoveByName() {
+            const name = document.getElementById('removeByNameInput').value.trim();
+            if (!name) {
+                showToast('Please enter a company name', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/leads/search/name?name=${encodeURIComponent(name)}`, {
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('access_token')}` }
+                });
+
+                if (!response.ok) throw new Error('Search failed');
+
+                const matches = await response.json();
+
+                if (matches.length === 0) {
+                    showToast(`No lead found with name: "${name}"`, 'error');
+                } else if (matches.length === 1) {
+                    if (confirm(`Remove lead for "${matches[0].company_name}" (${matches[0].industry})?`)) {
+                        deleteLead(matches[0].id);
+                        document.getElementById('removeByNameInput').value = '';
+                    }
+                } else {
+                    // Show selection modal
+                    showSelectionModal(name, matches);
+                    document.getElementById('removeByNameInput').value = '';
+                }
+            } catch (error) {
+                showToast('Error: ' + error.message, 'error');
+            }
+        }
+
+        function showSelectionModal(name, matches) {
+            document.getElementById('selectionCompanyName').textContent = name;
+            const list = document.getElementById('selectionList');
+            
+            list.innerHTML = matches.map(lead => `
+                <div class="flex items-center justify-between p-4 border rounded-lg mb-3 hover:bg-gray-50 transition-colors">
+                    <div>
+                        <div class="font-bold text-lg">${lead.company_name}</div>
+                        <div class="text-sm text-gray-500">${lead.industry}</div>
+                        <div class="mt-1">
+                            ${lead.score ? `
+                                <span class="text-xs px-2 py-0.5 rounded-full text-white" 
+                                      style="background-color: ${lead.score.score_label === 'Hot' ? '#dc2626' : lead.score.score_label === 'Warm' ? '#f59e0b' : '#3b82f6'}">
+                                    ${lead.score.score_label} (${lead.score.score_value})
+                                </span>
+                            ` : '<span class="text-xs text-gray-400">Not scored</span>'}
+                        </div>
+                    </div>
+                    <button onclick="deleteLead('${lead.id}')" class="bg-red-100 text-red-600 hover:bg-red-600 hover:text-white px-4 py-2 rounded-lg font-bold transition-all">
+                        Remove
+                    </button>
+                </div>
+            `).join('');
+
+            document.getElementById('selectionModal').classList.remove('hidden');
+        }
+
+        function closeSelectionModal() {
+            document.getElementById('selectionModal').classList.add('hidden');
+        }
+
+        function switchTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.add('hidden'));
+            
+            // Remove active state from all buttons
+            document.querySelectorAll('.tab-button').forEach(btn => {
+                btn.classList.remove('active', 'bg-blue-600', 'text-white');
+                btn.classList.add('bg-gray-200', 'text-gray-700');
+            });
+
+            // Show selected tab
+            const tabElement = document.getElementById(tabName + '-tab');
+            if (tabElement) {
+                tabElement.classList.remove('hidden');
+            }
+            
+            // Highlight selected button
+            const buttons = document.querySelectorAll('.tab-button');
+            buttons.forEach(btn => {
+                if (btn.getAttribute('data-tab') === tabName) {
+                    btn.classList.remove('bg-gray-200', 'text-gray-700');
+                    btn.classList.add('active', 'bg-blue-600', 'text-white');
+                }
+            });
+        }
+
+        function logout() {
+            localStorage.removeItem('access_token');
+            window.location.href = '/';
+        }
+    </script>
+</body>
+</html>

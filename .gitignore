@@ -1,0 +1,33 @@
+# Environment variables
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.pytest_cache/
+.venv/
+venv/
+
+# Local data / fallbacks
+leadai/data/*.json
+!leadai/data/.gitkeep
+
+# IDEs
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.swp
+
+# Docker
+.docker/
+
+# System files
+.DS_Store
+Thumbs.db

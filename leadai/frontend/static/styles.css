@@ -1,0 +1,122 @@
+/* LeadAI Custom Styles */
+
+:root {
+    --primary-color: #2563eb;
+    --primary-dark: #1d4ed8;
+    --success-color: #10b981;
+    --warning-color: #f59e0b;
+    --danger-color: #ef4444;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+}
+
+/* Transitions */
+* {
+    transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+/* Buttons */
+button {
+    cursor: pointer;
+}
+
+button:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+
+/* Inputs */
+input, textarea, select {
+    transition: all 0.2s ease;
+}
+
+input:focus, textarea:focus, select:focus {
+    outline: none;
+}
+
+/* Modal */
+.modal-overlay {
+    backdrop-filter: blur(4px);
+}
+
+/* Status Badges */
+.status-badge {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.status-hot {
+    background-color: #fecaca;
+    color: #991b1b;
+}
+
+.status-warm {
+    background-color: #fed7aa;
+    color: #92400e;
+}
+
+.status-cold {
+    background-color: #bfdbfe;
+    color: #1e3a8a;
+}
+
+/* Loading State */
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.loading {
+    animation: spin 1s linear infinite;
+}
+
+/* Table Styles */
+table {
+    border-collapse: collapse;
+}
+
+table thead {
+    background-color: #f3f4f6;
+}
+
+table tbody tr {
+    border-bottom: 1px solid #e5e7eb;
+}
+
+table tbody tr:hover {
+    background-color: #f9fafb;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .overflow-x-auto {
+        font-size: 0.875rem;
+    }
+
+    table th, table td {
+        padding: 0.5rem;
+    }
+}
+
+/* Dark mode support (optional) */
+@media (prefers-color-scheme: dark) {
+    body {
+        background-color: #111827;
+        color: #f3f4f6;
+    }
+
+    input, textarea, select {
+        background-color: #1f2937;
+        color: #f3f4f6;
+        border-color: #374151;
+    }
+}

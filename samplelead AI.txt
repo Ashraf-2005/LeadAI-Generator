@@ -1,0 +1,11 @@
+company_name,industry,website,notes
+ABC Healthcare Solutions,Healthcare,abchealthcare.com,Actively looking to digitize patient records and mentioned budget approval this quarter
+TechNova Systems,Information Technology,technova.io,Recently posted about needing AI tools to automate customer support
+GreenLeaf Organics,Retail,greenleaforganics.in,Small local store exploring options but no clear timeline mentioned
+BuildRight Constructions,Construction,buildright.co,Filled contact form asking for project management software recommendations
+Sunrise Bakery,Food & Beverage,sunrisebakery.com,Casual inquiry about website redesign with no urgency indicated
+FinEdge Capital,Finance,finedge.com,CTO reached out directly asking for a demo of our AI risk analysis tool
+Quantum Robotics Labs,Manufacturing,quantumrobotics.tech,Requested a detailed proposal for AI-based quality inspection system for their factory line
+Bright Minds Tutoring,Education,brightmindstutor.com,Downloaded a whitepaper but has not responded to follow-up emails
+Skyline Logistics,Transportation,skylinelogistics.com,Mentioned they are comparing three vendors for fleet tracking AI solution
+Urban Threads Apparel,Fashion Retail,urbanthreads.shop,General inquiry from contact form with minimal details provided

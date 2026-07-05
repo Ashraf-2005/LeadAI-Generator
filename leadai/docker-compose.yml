@@ -1,0 +1,42 @@
+version: '3.8'
+
+services:
+  # FastAPI Backend
+  backend:
+    build: .
+    container_name: leadai-backend
+    ports:
+      - "8000:8000"
+    environment:
+      - ENV=development
+      - GROQ_API_KEY=${GROQ_API_KEY}
+      - SECRET_KEY=${SECRET_KEY:-your-secret-key-change-in-production}
+      - SALES_USERNAME=${SALES_USERNAME:-sales}
+      - SALES_PASSWORD=${SALES_PASSWORD:-sales123}
+      - LEAD_SCORE_THRESHOLD=70
+      - MONGO_URI=${MONGO_URI}
+    volumes:
+      - ./backend:/app/backend
+      - ./data:/app/data
+    networks:
+      - leadai-network
+    restart: unless-stopped
+
+  # Nginx Reverse Proxy & Frontend Serving
+  nginx:
+    image: nginx:latest
+    container_name: leadai-nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./frontend:/usr/share/nginx/html:ro
+    depends_on:
+      - backend
+    networks:
+      - leadai-network
+    restart: unless-stopped
+
+networks:
+  leadai-network:
+    driver: bridge
