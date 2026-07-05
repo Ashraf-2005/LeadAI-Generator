@@ -87,8 +87,8 @@ if os.path.exists(FRONTEND_DIR):
     app.mount("/static", StaticFiles(directory=os.path.join(FRONTEND_DIR, "static")), name="static")
 
 
-# Serve index.html for root
-@app.get("/", include_in_schema=False)
+# Serve index.html for root (supports GET and HEAD for health checks)
+@app.api_route("/", methods=["GET", "HEAD"], include_in_schema=False)
 async def root():
     """Serve index.html as root."""
     if os.path.exists(FRONTEND_DIR):
