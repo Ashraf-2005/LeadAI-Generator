@@ -4,13 +4,52 @@
  */
 
 // API Configuration
-const API_BASE = '/api';
+const API_BASE = window.location.port === '8000' || window.location.port === '' || window.location.port === '80'
+    ? '/api'
+    : 'http://localhost:8000/api';
+
+// Auth: Login
+async function loginUser(username, password) {
+    const response = await fetch(`${API_BASE}/auth/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password }),
+    });
+
+    if (!response.ok) {
+        const error = await response.json().catch(() => ({ detail: 'Login failed' }));
+        throw new Error(error.detail || 'Login failed');
+    }
+
+    const data = await response.json();
+    localStorage.setItem('access_token', data.access_token);
+    return data;
+}
+
+// Auth: Register
+async function registerUser(username, password) {
+    const response = await fetch(`${API_BASE}/auth/register`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password }),
+    });
+
+    if (!response.ok) {
+        const error = await response.json().catch(() => ({ detail: 'Registration failed' }));
+        throw new Error(error.detail || 'Registration failed');
+    }
+
+    const data = await response.json();
+    localStorage.setItem('access_token', data.access_token);
+    return data;
+}
 
 // API Client with automatic token attachment
 async function apiCall(endpoint, options = {}) {
     const token = localStorage.getItem('access_token');
     const headers = {
         'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
         ...options.headers,
     };
 
@@ -58,6 +97,26 @@ function showToast(message, type = 'info') {
     setTimeout(() => {
         toast.remove();
     }, 3000);
+}
+
+// Alert helper used by login.html (showAlert)
+function showAlert(message, type = 'info') {
+    const container = document.getElementById('alertContainer');
+    if (!container) {
+        showToast(message, type);
+        return;
+    }
+    container.innerHTML = `
+        <div class="alert alert-${type === 'error' ? 'error' : 'success'}" style="
+            padding: 0.75rem 1rem;
+            margin-bottom: 1rem;
+            border-radius: 6px;
+            background: ${type === 'error' ? '#fee2e2' : '#dcfce7'};
+            color: ${type === 'error' ? '#991b1b' : '#166534'};
+        ">
+            ${message}
+        </div>
+    `;
 }
 
 // Theme toggle (light/dark)
